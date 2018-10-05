@@ -1,7 +1,8 @@
 import java.util.*
 
 fun main(args: Array<String>) {
-    PlusOrLessAsker().plusOrLess(100)
+//    PlusOrLessMaster(100).plusOrLess()
+    solve(1000)
 }
 
 enum class Ratio(val value: String) {
@@ -30,6 +31,32 @@ class PlusOrLessMaster(max: Int) {
             guess = try {input?.toInt()} catch (e: NumberFormatException) {null}
             println(if (guess == null) "Bad entry" else ask(guess).value)
         } while (number != guess)
+    }
+}
+
+fun printStepSummaryLine(step: Int, next: Int, max: Int) {
+    val lineSize = 190
+    val char = "*"
+    println(step.toString() + " " + char.repeat((next * lineSize) / max) + " " + next.toString())
+}
+
+fun solve(max: Int) {
+    printStepSummaryLine(0, max, max)
+    val master = PlusOrLessMaster(max)
+    var mini = 0
+    var maxi = max
+    var next = mini + (mini + maxi) / 2
+    var step = 0
+    loop@ while (true) {
+        step++
+        val answer = master.ask(next)
+        printStepSummaryLine(step, next, max)
+        when (answer) {
+            Ratio.TOO_BIG -> maxi = next
+            Ratio.TOO_SMALL -> mini = next
+            Ratio.EQUALS -> break@loop
+        }
+        next = (mini + maxi) / 2
     }
 }
 
