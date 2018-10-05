@@ -4,27 +4,32 @@ fun main(args: Array<String>) {
     PlusOrLessAsker().plusOrLess(100)
 }
 
-class PlusOrLessAsker {
+enum class Ratio(val value: String) {
+    TOO_BIG("Too big"),
+    TOO_SMALL("Too small"),
+    EQUALS("Equals")
+}
 
-    fun plusOrLess(max: Int=100) {
-        val number = Random().nextInt(max)
+class PlusOrLessMaster(max: Int) {
+
+    private val number: Int = Random().nextInt(max)
+
+    fun ask(test: Int): Ratio {
+        return when {
+            test < number -> Ratio.TOO_SMALL
+            test > number -> Ratio.TOO_BIG
+            else -> Ratio.EQUALS
+        }
+    }
+
+    fun plusOrLess() {
         var input: String?
         var guess: Int?
         do {
             input = readLine()
             guess = try {input?.toInt()} catch (e: NumberFormatException) {null}
-            when {
-                guess == null -> println("Bad entry")
-                guess < number -> println(TOO_SMALL)
-                guess > number -> println(TOO_BIG)
-                guess == number -> println("Win $guess")
-            }
+            println(if (guess == null) "Bad entry" else ask(guess).value)
         } while (number != guess)
-    }
-
-    companion object {
-        const val TOO_BIG = "Too big"
-        const val TOO_SMALL = "To small"
     }
 }
 
