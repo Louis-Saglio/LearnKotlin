@@ -35,6 +35,11 @@ fun inputInt(message: String = ""): Int {
     }
 }
 
+fun inputPlace(message: String = ""): Place {
+    println(message)
+    return Place(inputInt("Choose x"), inputInt("Choose y"))
+}
+
 val SHIP_CHOICES = setOf(
         Ship("avion", 2),
         Ship("sous-marin", 3),
@@ -157,6 +162,17 @@ class Player(private val name: String, private val ships: MutableSet<Ship> = mut
             val position = Position(Place(x, y), direction)
             this.addShip(Ship(ship.name, ship.size, position))
         }
+    }
+
+    fun getMissileAttack(place: Place): Boolean {
+        for (ship in ships) {
+            val part = ship.getPartByPlace(place)
+            if (part != null && part.state != ShipState.DESTROYED) {
+                part.state = ShipState.DESTROYED
+                return true
+            }
+        }
+        return false
     }
 }
 
