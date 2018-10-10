@@ -46,28 +46,37 @@ val SHIP_CHOICES = setOf(
 const val MAX_X = 9
 const val MAX_Y = 9
 
-class Position(x: Int, y: Int, val direction: Direction) {
+class Position(val place: Place, val direction: Direction) {
+    override fun toString(): String {
+        return "Position(direction=$direction, x=${place.x}, y=${place.y})"
+    }
+}
+
+class Place(x: Int, y: Int) {
     val x = if (x in 0..MAX_X) x else throw Exception("$x is not between 0 and $MAX_X")
     val y = if (x in 0..MAX_Y) y else throw Exception("$y is not between 0 and $MAX_Y")
-    override fun toString(): String {
-        return "Position(direction=$direction, x=$x, y=$y)"
+
+    override fun equals(other: Any?): Boolean {
+        return when {
+            other == null -> false
+            other !is Place -> false
+            other.x == this.x && other.y == this.y -> true
+            else -> false
+        }
     }
 
-
+    override fun hashCode() = setOf(x, y).hashCode()
 }
 
 class Ship(val name: String, val size: Int, private val position: Position? = null) {
 
-    init {
-        if (!this.isInBorder() && this.position != null) throw Exception("Not in border")
-    }
-
-    private fun isInBorder(): Boolean {
-        if (this.position == null) return false
-        var x = this.position.x
-        var y = this.position.y
+    private fun getPlaces(): Set<Place> {
+        if (this.position == null) return setOf()
+        val positions = mutableSetOf<Place>()
+        var x = this.position.place.x
+        var y = this.position.place.y
         for (i in 0 until this.size) {
-            if (x !in 0..MAX_X || y !in 0..MAX_Y) return false
+            positions.add(Place(x, y))
             when (this.position.direction) {
                 Direction.UP -> y += 1
                 Direction.DOWN -> y -= 1
@@ -75,32 +84,14 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
                 Direction.LEFT -> x -= 1
             }
         }
-        return true
+        return positions.toSet()
     }
 
     fun doesNotInterpolate(ship: Ship): Boolean {
         if (this.position == null || ship.position == null) return false
-        var x = this.position.x
-        var y = this.position.y
-        for (i in 0 until this.size) {
-            var a = ship.position.x
-            var b = ship.position.y
-            for (n in 0 until ship.size) {
-                if (x == a && y == b) {
-                    return false
-                }
-                when (ship.position.direction) {
-                    Direction.UP -> b += 1
-                    Direction.DOWN -> b -= 1
-                    Direction.RIGHT -> a += 1
-                    Direction.LEFT -> a -= 1
-                }
-            }
-            when (this.position.direction) {
-                Direction.UP -> y += 1
-                Direction.DOWN -> y -= 1
-                Direction.RIGHT -> x += 1
-                Direction.LEFT -> x -= 1
+        for (place in this.getPlaces()) {
+            for (place_ in ship.getPlaces()) {
+                if (place == place_) return false
             }
         }
         return true
@@ -125,7 +116,7 @@ class Player(private val name: String, private val ships: MutableSet<Ship> = mut
             val x = inputInt("Choose x for the ${ship.name} (${ship.size})")
             val y = inputInt("Choose y for the ${ship.name} (${ship.size})")
             val direction = inputDirection("Choose direction for the ${ship.name} (${ship.size})")
-            val position = Position(x, y, direction)
+            val position = Position(Place(x, y), direction)
             this.addShip(Ship(ship.name, ship.size, position))
         }
     }
