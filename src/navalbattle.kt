@@ -48,7 +48,7 @@ const val MAX_Y = 9
 
 class Position(val place: Place, val direction: Direction) {
     override fun toString(): String {
-        return "Position(direction=$direction, x=${place.x}, y=${place.y})"
+        return "Position($place, $direction)"
     }
 }
 
@@ -66,6 +66,11 @@ class Place(x: Int, y: Int) {
     }
 
     override fun hashCode() = setOf(x, y).hashCode()
+    override fun toString(): String {
+        return "Place($x, $y)"
+    }
+
+
 }
 
 class Ship(val name: String, val size: Int, private val position: Position? = null) {
@@ -96,6 +101,12 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
         }
         return true
     }
+
+    override fun toString(): String {
+        return "Ship(name='$name', size=$size, $position)"
+    }
+
+
 }
 
 
