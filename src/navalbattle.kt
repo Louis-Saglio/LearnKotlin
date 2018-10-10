@@ -73,7 +73,19 @@ class Place(x: Int, y: Int) {
 
 }
 
+enum class ShipPartState {
+    INTACT, DESTROYED
+}
+
+class ShipPart(val place: Place, var state: ShipPartState = ShipPartState.INTACT) {
+    override fun toString(): String {
+        return "Part($place, $state)"
+    }
+}
+
 class Ship(val name: String, val size: Int, private val position: Position? = null) {
+
+    val parts = this.buildParts()
 
     private fun getPlaces(): Set<Place> {
         if (this.position == null) return setOf()
@@ -92,11 +104,26 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
         return positions.toSet()
     }
 
+    fun getPartByPlace(place: Place): ShipPart? {
+        for (part in parts) {
+            if (part.place == place) return part
+        }
+        return null
+    }
+
+    private fun buildParts(): Set<ShipPart> {
+        val parts = mutableSetOf<ShipPart>()
+        for (place in this.getPlaces()) {
+            parts.add(ShipPart(place))
+        }
+        return parts.toSet()
+    }
+
     fun doesNotInterpolate(ship: Ship): Boolean {
         if (this.position == null || ship.position == null) return false
-        for (place in this.getPlaces()) {
-            for (place_ in ship.getPlaces()) {
-                if (place == place_) return false
+        for (part in this.parts) {
+            for (part_ in ship.parts) {
+                if (part.place == part_.place) return false
             }
         }
         return true
