@@ -1,8 +1,8 @@
 import java.util.*
 
 fun main(args: Array<String>) {
-//    PlusOrLessMaster(100).plusOrLess()
-    solve(1000)
+    PlusOrLessMaster(100).plusOrLess()
+    solve(100)
 }
 
 enum class Ratio(val value: String) {
@@ -28,7 +28,11 @@ class PlusOrLessMaster(max: Int) {
         var guess: Int?
         do {
             input = readLine()
-            guess = try {input?.toInt()} catch (e: NumberFormatException) {null}
+            guess = try {
+                input?.toInt()
+            } catch (e: NumberFormatException) {
+                null
+            }
             println(if (guess == null) "Bad entry" else ask(guess).value)
         } while (number != guess)
     }
