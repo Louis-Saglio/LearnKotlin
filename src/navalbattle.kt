@@ -1,5 +1,3 @@
-import java.lang.Exception
-
 enum class Direction {
     UP, DOWN, RIGHT, LEFT
 }
@@ -135,7 +133,7 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
     }
 
     override fun toString(): String {
-        return "Ship(name='$name', size=$size, $position)"
+        return "Ship($name, $size, $position, ${getState()})"
     }
 
     fun getState(): ShipState {
@@ -149,7 +147,7 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
 }
 
 
-class Player(private val name: String, private val ships: MutableSet<Ship> = mutableSetOf()) {
+class Player(private val name: String, val ships: MutableSet<Ship> = mutableSetOf()) {
 
     private fun addShip(ship: Ship) {
         for (ship_ in ships) {
@@ -181,11 +179,25 @@ class Player(private val name: String, private val ships: MutableSet<Ship> = mut
         }
         return false
     }
+
+    fun hasBeenDefeated(): Boolean {
+        for (ship in ships) {
+            if (ship.getState() != ShipState.DESTROYED) return false
+        }
+        return true
+    }
 }
 
 fun main(args: Array<String>) {
     val players = listOf(Player("Player1"), Player("Player2"))
     for (player in players) {
-        player.setFleet()
+        player.setFleet(setOf(Ship("plane", 2)))
     }
+    var tourNbr = 0
+    do {
+        players[(tourNbr + 1) % 2].getMissileAttack(inputPlace("Player ${tourNbr % 2} choose target"))
+        tourNbr++
+    } while (!players[0].hasBeenDefeated() && !players[1].hasBeenDefeated())
+    println(players[0].hasBeenDefeated())
+    println(players[1].hasBeenDefeated())
 }
