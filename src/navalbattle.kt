@@ -78,11 +78,11 @@ class Place(x: Int, y: Int) {
 
 }
 
-enum class ShipPartState {
-    INTACT, DESTROYED
+enum class ShipState {
+    WORKING, DESTROYED
 }
 
-class ShipPart(val place: Place, var state: ShipPartState = ShipPartState.INTACT) {
+class ShipPart(val place: Place, var state: ShipState = ShipState.WORKING) {
     override fun toString(): String {
         return "Part($place, $state)"
     }
@@ -136,6 +136,13 @@ class Ship(val name: String, val size: Int, private val position: Position? = nu
 
     override fun toString(): String {
         return "Ship(name='$name', size=$size, $position)"
+    }
+
+    fun getState(): ShipState {
+        for (part in parts) {
+            if (part.state != ShipState.DESTROYED) return ShipState.WORKING
+        }
+        return ShipState.DESTROYED
     }
 
 
